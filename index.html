@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resistor Color Code Game - ECE Web Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2387/2387545.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --g-blue: #1a73e8;
+            --g-blue-hover: #1765cc;
+            --g-gray: #5f6368;
+            --g-gray-light: #f1f3f4;
+            --g-gray-border: #dadce0;
+            --g-text: #202124;
+            --g-text-light: #70757a;
+            --g-white: #ffffff;
+            --g-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15);
+            --g-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --g-green: #34a853;
+            --g-red: #ea4335;
+            --g-yellow: #fbbc05;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--g-white);
+            color: var(--g-text);
+            line-height: 1.5;
+            font-size: 14px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .g-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            height: 64px;
+            border-bottom: 1px solid var(--g-gray-border);
+            background: var(--g-white);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .g-header-logo {
+            display: flex;
+            align-items: center;
+            margin-right: 40px;
+        }
+
+        .g-header-logo-icon {
+            color: var(--g-blue);
+            font-size: 32px;
+            margin-right: 8px;
+        }
+
+        .g-header-logo-text {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--g-text);
+        }
+
+        /* Main Content */
+        .g-main {
+            flex: 1;
+            padding: 104px 16px 80px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Card Styles */
+        .g-card {
+            background: var(--g-white);
+            border-radius: 8px;
+            border: 1px solid var(--g-gray-border);
+            overflow: hidden;
+            transition: var(--g-transition);
+            margin-bottom: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .g-card:hover {
+            box-shadow: var(--g-shadow);
+        }
+
+        .g-card-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--g-gray-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .g-card-title {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--g-text);
+        }
+
+        .g-card-body {
+            padding: 24px;
+        }
+
+        /* Resistor Styles */
+        .resistor {
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(to right, #d3d3d3, #a9a9a9, #d3d3d3);
+            border-radius: 8px;
+            position: relative;
+            margin: 20px auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 500px;
+        }
+
+        .resistor:before, .resistor:after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 40px;
+            background: #c0c0c0;
+            top: 20px;
+            border-radius: 4px;
+        }
+
+        .resistor:before {
+            left: -20px;
+        }
+
+        .resistor:after {
+            right: -20px;
+        }
+
+        .band {
+            position: absolute;
+            width: 20px;
+            height: 100%;
+            top: 0;
+            border-radius: 4px;
+        }
+
+        .band-1 { left: 15%; }
+        .band-2 { left: 25%; }
+        .band-3 { left: 35%; }
+        .band-4 { left: 75%; }
+
+        /* Color Options */
+        .color-options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--g-transition);
+            border: 2px solid transparent;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .color-option.selected {
+            border: 2px solid var(--g-text);
+            box-shadow: 0 0 0 3px var(--g-blue);
+        }
+
+        /* Button Styles */
+        .g-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            background-color: var(--g-blue);
+            color: var(--g-white);
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--g-transition);
+            text-decoration: none;
+        }
+
+        .g-button:hover {
+            background-color: var(--g-blue-hover);
+            box-shadow: 0 1px 2px 0 rgba(66,133,244,0.3), 0 1px 3px 1px rgba(66,133,244,0.15);
+        }
+
+        .g-button.secondary {
+            background-color: var(--g-gray-light);
+            color: var(--g-text);
+        }
+
+        .g-button.secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Progress and Stats */
+        .g-progress-container {
+            height: 8px;
+            background-color: var(--g-gray-light);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+
+        .g-progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, var(--g-blue), var(--g-green));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .g-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .g-stat {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: var(--g-text);
+        }
+
+        .g-stat .material-icons {
+            margin-right: 4px;
+            color: var(--g-blue);
+        }
+
+        /* Feedback */
+        .g-feedback {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin: 16px 0;
+            display: none;
+        }
+
+        .g-feedback.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        .g-feedback.success {
+            background-color: rgba(52, 168, 83, 0.1);
+            border-left: 4px solid var(--g-green);
+        }
+
+        .g-feedback.error {
+            background-color: rgba(234, 67, 53, 0.1);
+            border-left: 4px solid var(--g-red);
+        }
+
+        .g-feedback.warning {
+            background-color: rgba(251, 188, 5, 0.1);
+            border-left: 4px solid var(--g-yellow);
+        }
+
+        /* Tutorial Steps */
+        .g-tutorial-step {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .g-tutorial-step.active {
+            display: block;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .correct-answer {
+            animation: correctPulse 0.5s;
+            background-color: var(--g-green) !important;
+            color: white !important;
+        }
+
+        .incorrect-answer {
+            animation: shake 0.5s;
+            background-color: var(--g-red) !important;
+            color: white !important;
+        }
+
+        /* Footer */
+        .g-footer {
+            background-color: var(--g-white);
+            border-top: 1px solid var(--g-gray-border);
+            padding: 16px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .g-footer-text {
+            color: var(--g-gray);
+            font-size: 12px;
+        }
+
+        /* Utility Classes */
+        .g-text-center {
+            text-align: center;
+        }
+
+        .g-mt-2 {
+            margin-top: 8px;
+        }
+
+        .g-mb-2 {
+            margin-bottom: 8px;
+        }
+
+        .g-mb-3 {
+            margin-bottom: 16px;
+        }
+
+        .g-mb-4 {
+            margin-bottom: 24px;
+        }
+
+        .g-mx-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .g-flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .g-gap-2 {
+            gap: 8px;
+        }
+
+        /* Table Styles */
+        .g-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .g-table th {
+            background-color: var(--g-gray-light);
+            text-align: left;
+            padding: 8px;
+            font-weight: 500;
+        }
+
+        .g-table td {
+            padding: 8px;
+            border-bottom: 1px solid var(--g-gray-border);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .g-header {
+                height: 56px;
+                padding: 8px;
+            }
+            
+            .g-header-logo-text {
+                font-size: 18px;
+            }
+            
+            .g-main {
+                padding: 96px 16px 72px;
+            }
+
+            .g-card-body {
+                padding: 16px;
+            }
+
+            .band-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .g-stats {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .g-button {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="g-header">
+        <div class="g-header-logo">
+            <span class="g-header-logo-icon material-icons">science</span>
+            <span class="g-header-logo-text">ECE Web Lab</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="g-main">
+        <div class="g-card">
+            <div class="g-card-header">
+                <h2 class="g-card-title">Resistor Color Code Game</h2>
+                <div class="g-stats">
+                    <div class="g-stat">
+                        <span class="material-icons">star</span>
+                        <span id="level">1</span>/5
+                    </div>
+                    <div class="g-stat">
+                        <span class="material-icons">emoji_events</span>
+                        <span id="score">0</span>
+                    </div>
+                    <div class="g-stat">
+                        <span class="material-icons">local_fire_department</span>
+                        <span id="streak">0</span>x
+                    </div>
+                </div>
+            </div>
+            <div class="g-card-body">
+                <div class="g-progress-container">
+                    <div class="g-progress-bar" id="progress"></div>
+                </div>
+
+                <div class="g-text-center g-mb-4">
+                    <div class="g-flex-center g-gap-2">
+                        <button id="tutorialBtn" class="g-button">
+                            <span class="material-icons">school</span> Tutorial
+                        </button>
+                        <button id="practiceBtn" class="g-button secondary">
+                            <span class="material-icons">play_circle</span> Practice
+                        </button>
+                        <button id="quizBtn" class="g-button secondary">
+                            <span class="material-icons">quiz</span> Quiz Mode
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tutorial Section -->
+                <div id="tutorialSection" style="display: none;">
+                    <div class="g-tutorial-step active" data-step="1">
+                        <h3 class="g-card-title"><span class="material-icons">info</span> What is a Resistor?</h3>
+                        <p class="g-mb-3">A resistor is a passive electrical component that limits or regulates the flow of electrical current in a circuit. It's one of the most common components in electronic devices.</p>
+                        <div class="g-text-center g-mb-3">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Resistor_symbol_America.svg/2560px-Resistor_symbol_America.svg.png" alt="Resistor symbol" style="max-width: 100px;">
+                        </div>
+                        <div class="g-text-center">
+                            <button class="g-button next-step">Next <span class="material-icons">arrow_forward</span></button>
+                        </div>
+                    </div>
+                    
+                    <div class="g-tutorial-step" data-step="2">
+                        <h3 class="g-card-title"><span class="material-icons">palette</span> Color Coding System</h3>
+                        <p class="g-mb-2">Resistors use colored bands to indicate their resistance value, tolerance, and sometimes temperature coefficient.</p>
+                        <p class="g-mb-3">Most resistors have 4 bands:</p>
+                        <ol class="g-mb-3" style="padding-left: 24px;">
+                            <li><strong>First band:</strong> First digit of the value</li>
+                            <li><strong>Second band:</strong> Second digit of the value</li>
+                            <li><strong>Third band:</strong> Multiplier (number of zeros)</li>
+                            <li><strong>Fourth band:</strong> Tolerance (how much the actual value might vary)</li>
+                        </ol>
+                        <div class="g-text-center">
+                            <button class="g-button secondary prev-step"><span class="material-icons">arrow_back</span> Back</button>
+                            <button class="g-button next-step">Next <span class="material-icons">arrow_forward</span></button>
+                        </div>
+                    </div>
+                    
+                    <div class="g-tutorial-step" data-step="3">
+                        <h3 class="g-card-title"><span class="material-icons">color_lens</span> Color Code Chart</h3>
+                        <div class="g-mb-3" style="overflow-x: auto;">
+                            <table class="g-table">
+                                <thead>
+                                    <tr>
+                                        <th>Color</th>
+                                        <th>Digit</th>
+                                        <th>Multiplier</th>
+                                        <th>Tolerance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><div class="color-option g-mx-auto" style="background-color: black;"></div></td>
+                                        <td>0</td>
+                                        <td>10<sup>0</sup></td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="color-option g-mx-auto" style="background-color: #964B00;"></div></td>
+                                        <td>1</td>
+                                        <td>10<sup>1</sup></td>
+                                        <td>±1%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="color-option g-mx-auto" style="background-color: red;"></div></td>
+                                        <td>2</td>
+                                        <td>10<sup>2</sup></td>
+                                        <td>±2%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="color-option g-mx-auto" style="background-color: orange;"></div></td>
+                                        <td>3</td>
+                                        <td>10<sup>3</sup></td>
+                                        <td>±3%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="color-option g-mx-auto" style="background-color: yellow;"></div></td>
+                                        <td>4</td>
+                                        <td>10<sup>4</sup></td>
+                                        <td>±4%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="color-option g-mx-auto" style="background-color: green;"></div></td>
+                                        <td>5</td>
+                                        <td>10<sup>5</sup></td>
+                                        <td>±0.5%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="color-option g-mx-auto" style="background-color: blue;"></div></td>
+                                        <td>6</td>
+                                        <td>10<sup>6</sup></td>
+                                        <td>±0.25%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="color-option g-mx-auto" style="background-color: purple;"></div></td>
+                                        <td>7</td>
+                                        <td>10<sup>7</sup></td>
+                                        <td>±0.1%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="color-option g-mx-auto" style="background-color: gray;"></div></td>
+                                        <td>8</td>
+                                        <td>10<sup>8</sup></td>
+                                        <td>±0.05%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="color-option g-mx-auto" style="background-color: white;"></div></td>
+                                        <td>9</td>
+                                        <td>10<sup>9</sup></td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="color-option g-mx-auto" style="background-color: gold;"></div></td>
+                                        <td>-</td>
+                                        <td>10<sup>-1</sup></td>
+                                        <td>±5%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="color-option g-mx-auto" style="background-color: silver;"></div></td>
+                                        <td>-</td>
+                                        <td>10<sup>-2</sup></td>
+                                        <td>±10%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="g-text-center">
+                            <button class="g-button secondary prev-step"><span class="material-icons">arrow_back</span> Back</button>
+                            <button class="g-button next-step">Next <span class="material-icons">arrow_forward</span></button>
+                        </div>
+                    </div>
+                    
+                    <div class="g-tutorial-step" data-step="4">
+                        <h3 class="g-card-title"><span class="material-icons">calculate</span> Example Calculation</h3>
+                        <p class="g-mb-3">Let's read this resistor:</p>
+                        <div class="resistor g-mx-auto" style="max-width: 400px;">
+                            <div class="band band-1" style="background-color: yellow;"></div>
+                            <div class="band band-2" style="background-color: purple;"></div>
+                            <div class="band band-3" style="background-color: red;"></div>
+                            <div class="band band-4" style="background-color: gold;"></div>
+                        </div>
+                        <div class="g-mb-3">
+                            <p class="g-mb-1">1. First band (yellow) = <strong>4</strong></p>
+                            <p class="g-mb-1">2. Second band (purple) = <strong>7</strong></p>
+                            <p class="g-mb-1">3. Third band (red) = <strong>×10<sup>2</sup></strong> (or ×100)</p>
+                            <p class="g-mb-2">4. Fourth band (gold) = <strong>±5%</strong> tolerance</p>
+                            <div class="g-feedback success" style="display: block;">
+                                <strong>Value:</strong> 47 × 100 = <span style="font-family: monospace;">4700Ω (4.7kΩ)</span> with ±5% tolerance
+                            </div>
+                        </div>
+                        <div class="g-text-center">
+                            <button class="g-button secondary prev-step"><span class="material-icons">arrow_back</span> Back</button>
+                            <button class="g-button next-step">Next <span class="material-icons">arrow_forward</span></button>
+                        </div>
+                    </div>
+                    
+                    <div class="g-tutorial-step" data-step="5">
+                        <h3 class="g-card-title"><span class="material-icons">sports_esports</span> Ready to Practice?</h3>
+                        <p class="g-mb-3">Now that you understand the basics, let's try some practice problems!</p>
+                        <div class="g-feedback warning" style="display: block;">
+                            <p class="g-mb-1"><strong>Practice mode:</strong> You'll be shown a resistor and need to select the correct value.</p>
+                            <p><strong>Quiz mode:</strong> You'll need to select the correct color bands for a given resistance value.</p>
+                        </div>
+                        <div class="g-text-center">
+                            <button class="g-button secondary prev-step"><span class="material-icons">arrow_back</span> Back</button>
+                            <button class="g-button" id="startPractice"><span class="material-icons">play_arrow</span> Start Practicing</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Practice Section -->
+                <div id="practiceSection" style="display: none;">
+                    <h3 class="g-card-title g-text-center g-mb-3"><span class="material-icons">help_outline</span> What is the value of this resistor?</h3>
+                    <div class="resistor" id="resistorDisplay">
+                        <!-- Bands will be added dynamically -->
+                    </div>
+                    
+                    <div class="g-card g-mb-3">
+                        <div class="g-card-header">
+                            <h3 class="g-card-title"><span class="material-icons">list_alt</span> Options</h3>
+                        </div>
+                        <div class="g-card-body">
+                            <div class="color-options" id="valueOptions">
+                                <!-- Options will be added dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="feedback" style="min-height: 80px;"></div>
+                    
+                    <div class="g-text-center">
+                        <button id="nextResistor" class="g-button"><span class="material-icons">skip_next</span> Next Resistor</button>
+                    </div>
+                </div>
+                
+                <!-- Quiz Section -->
+                <div id="quizSection" style="display: none;">
+                    <h3 class="g-card-title g-text-center g-mb-3"><span class="material-icons">build</span> Create a <span id="targetValue" style="font-family: monospace;">X</span>Ω resistor</h3>
+                    <p class="g-text-center g-mb-3">Select colors for each band:</p>
+                    
+                    <div class="resistor g-mx-auto" id="quizResistor">
+                        <div class="band band-1" style="background-color: gray;"></div>
+                        <div class="band band-2" style="background-color: gray;"></div>
+                        <div class="band band-3" style="background-color: gray;"></div>
+                        <div class="band band-4" style="background-color: gold;"></div>
+                    </div>
+                    
+                    <div class="g-card g-mb-3">
+                        <div class="g-card-header">
+                            <h3 class="g-card-title">Color Bands Selection</h3>
+                        </div>
+                        <div class="g-card-body">
+                            <div class="band-options" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+                                <div>
+                                    <h4 class="g-card-title g-mb-2"><span class="material-icons">looks_one</span> 1st Digit</h4>
+                                    <div class="color-options">
+                                        <div class="color-option" style="background-color: black;" data-band="1" data-value="0"></div>
+                                        <div class="color-option" style="background-color: #964B00;" data-band="1" data-value="1"></div>
+                                        <div class="color-option" style="background-color: red;" data-band="1" data-value="2"></div>
+                                        <div class="color-option" style="background-color: orange;" data-band="1" data-value="3"></div>
+                                        <div class="color-option" style="background-color: yellow;" data-band="1" data-value="4"></div>
+                                        <div class="color-option" style="background-color: green;" data-band="1" data-value="5"></div>
+                                        <div class="color-option" style="background-color: blue;" data-band="1" data-value="6"></div>
+                                        <div class="color-option" style="background-color: purple;" data-band="1" data-value="7"></div>
+                                        <div class="color-option" style="background-color: gray;" data-band="1" data-value="8"></div>
+                                        <div class="color-option" style="background-color: white;" data-band="1" data-value="9"></div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="g-card-title g-mb-2"><span class="material-icons">looks_two</span> 2nd Digit</h4>
+                                    <div class="color-options">
+                                        <div class="color-option" style="background-color: black;" data-band="2" data-value="0"></div>
+                                        <div class="color-option" style="background-color: #964B00;" data-band="2" data-value="1"></div>
+                                        <div class="color-option" style="background-color: red;" data-band="2" data-value="2"></div>
+                                        <div class="color-option" style="background-color: orange;" data-band="2" data-value="3"></div>
+                                        <div class="color-option" style="background-color: yellow;" data-band="2" data-value="4"></div>
+                                        <div class="color-option" style="background-color: green;" data-band="2" data-value="5"></div>
+                                        <div class="color-option" style="background-color: blue;" data-band="2" data-value="6"></div>
+                                        <div class="color-option" style="background-color: purple;" data-band="2" data-value="7"></div>
+                                        <div class="color-option" style="background-color: gray;" data-band="2" data-value="8"></div>
+                                        <div class="color-option" style="background-color: white;" data-band="2" data-value="9"></div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="g-card-title g-mb-2"><span class="material-icons">close_fullscreen</span> Multiplier</h4>
+                                    <div class="color-options">
+                                        <div class="color-option" style="background-color: black;" data-band="3" data-value="1"></div>
+                                        <div class="color-option" style="background-color: #964B00;" data-band="3" data-value="10"></div>
+                                        <div class="color-option" style="background-color: red;" data-band="3" data-value="100"></div>
+                                        <div class="color-option" style="background-color: orange;" data-band="3" data-value="1000"></div>
+                                        <div class="color-option" style="background-color: yellow;" data-band="3" data-value="10000"></div>
+                                        <div class="color-option" style="background-color: green;" data-band="3" data-value="100000"></div>
+                                        <div class="color-option" style="background-color: blue;" data-band="3" data-value="1000000"></div>
+                                        <div class="color-option" style="background-color: purple;" data-band="3" data-value="10000000"></div>
+                                        <div class="color-option" style="background-color: gray;" data-band="3" data-value="100000000"></div>
+                                        <div class="color-option" style="background-color: white;" data-band="3" data-value="1000000000"></div>
+                                        <div class="color-option" style="background-color: gold;" data-band="3" data-value="0.1"></div>
+                                        <div class="color-option" style="background-color: silver;" data-band="3" data-value="0.01"></div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="g-card-title g-mb-2"><span class="material-icons">plus_minus</span> Tolerance</h4>
+                                    <div class="color-options">
+                                        <div class="color-option" style="background-color: #964B00;" data-band="4" data-value="1"></div>
+                                        <div class="color-option" style="background-color: red;" data-band="4" data-value="2"></div>
+                                        <div class="color-option" style="background-color: orange;" data-band="4" data-value="3"></div>
+                                        <div class="color-option" style="background-color: yellow;" data-band="4" data-value="4"></div>
+                                        <div class="color-option" style="background-color: green;" data-band="4" data-value="0.5"></div>
+                                        <div class="color-option" style="background-color: blue;" data-band="4" data-value="0.25"></div>
+                                        <div class="color-option" style="background-color: purple;" data-band="4" data-value="0.1"></div>
+                                        <div class="color-option" style="background-color: gray;" data-band="4" data-value="0.05"></div>
+                                        <div class="color-option" style="background-color: gold;" data-band="4" data-value="5"></div>
+                                        <div class="color-option" style="background-color: silver;" data-band="4" data-value="10"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="quizFeedback" style="min-height: 80px;"></div>
+                    
+                    <div class="g-text-center">
+                        <div class="g-flex-center g-gap-2">
+                            <button id="checkAnswer" class="g-button"><span class="material-icons">check_circle</span> Check Answer</button>
+                            <button id="nextQuiz" class="g-button"><span class="material-icons">skip_next</span> Next Challenge</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="g-footer">
+        <p class="g-footer-text">© 2023 ECE Web Lab - A neuraglobal Product. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Game state
+        const gameState = {
+            mode: null, // 'tutorial', 'practice', 'quiz'
+            level: 1,
+            score: 0,
+            streak: 0,
+            progress: 0,
+            currentResistor: null,
+            targetResistor: null,
+            colorCodes: {
+                'black': {digit: 0, multiplier: 1, tolerance: null},
+                'brown': {digit: 1, multiplier: 10, tolerance: 1},
+                'red': {digit: 2, multiplier: 100, tolerance: 2},
+                'orange': {digit: 3, multiplier: 1000, tolerance: 3},
+                'yellow': {digit: 4, multiplier: 10000, tolerance: 4},
+                'green': {digit: 5, multiplier: 100000, tolerance: 0.5},
+                'blue': {digit: 6, multiplier: 1000000, tolerance: 0.25},
+                'purple': {digit: 7, multiplier: 10000000, tolerance: 0.1},
+                'gray': {digit: 8, multiplier: 100000000, tolerance: 0.05},
+                'white': {digit: 9, multiplier: 1000000000, tolerance: null},
+                'gold': {digit: null, multiplier: 0.1, tolerance: 5},
+                'silver': {digit: null, multiplier: 0.01, tolerance: 10}
+            },
+            colorNames: ['black', 'brown', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'gray', 'white', 'gold', 'silver'],
+            digitColors: ['black', 'brown', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'gray', 'white'],
+            multiplierColors: ['black', 'brown', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'gray', 'white', 'gold', 'silver'],
+            toleranceColors: ['brown', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'gray', 'gold', 'silver']
+        };
+
+        // DOM elements
+        const tutorialBtn = document.getElementById('tutorialBtn');
+        const practiceBtn = document.getElementById('practiceBtn');
+        const quizBtn = document.getElementById('quizBtn');
+        const tutorialSection = document.getElementById('tutorialSection');
+        const practiceSection = document.getElementById('practiceSection');
+        const quizSection = document.getElementById('quizSection');
+        const resistorDisplay = document.getElementById('resistorDisplay');
+        const valueOptions = document.getElementById('valueOptions');
+        const feedback = document.getElementById('feedback');
+        const nextResistor = document.getElementById('nextResistor');
+        const targetValue = document.getElementById('targetValue');
+        const quizResistor = document.getElementById('quizResistor');
+        const quizFeedback = document.getElementById('quizFeedback');
+        const checkAnswer = document.getElementById('checkAnswer');
+        const nextQuiz = document.getElementById('nextQuiz');
+        const levelDisplay = document.getElementById('level');
+        const scoreDisplay = document.getElementById('score');
+        const streakDisplay = document.getElementById('streak');
+        const progressFill = document.getElementById('progress');
+        const startPractice = document.getElementById('startPractice');
+
+        // Tutorial navigation
+        const tutorialSteps = document.querySelectorAll('.g-tutorial-step');
+        let currentStep = 0;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStats();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Mode buttons
+            tutorialBtn.addEventListener('click', () => setMode('tutorial'));
+            practiceBtn.addEventListener('click', () => setMode('practice'));
+            quizBtn.addEventListener('click', () => setMode('quiz'));
+            startPractice.addEventListener('click', () => setMode('practice'));
+
+            // Tutorial navigation
+            document.querySelectorAll('.next-step').forEach(btn => {
+                btn.addEventListener('click', nextTutorialStep);
+            });
+            
+            document.querySelectorAll('.prev-step').forEach(btn => {
+                btn.addEventListener('click', prevTutorialStep);
+            });
+
+            // Practice mode
+            nextResistor.addEventListener('click', generatePracticeResistor);
+
+            // Quiz mode
+            checkAnswer.addEventListener('click', checkQuizAnswer);
+            nextQuiz.addEventListener('click', generateQuizResistor);
+            
+            // Color selection in quiz mode
+            document.querySelectorAll('.color-option[data-band]').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options in this band
+                    const band = this.getAttribute('data-band');
+                    document.querySelectorAll(`.color-option[data-band="${band}"]`).forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    
+                    const value = this.getAttribute('data-value');
+                    const color = this.style.backgroundColor;
+                    
+                    // Update the resistor display
+                    const bandElement = quizResistor.querySelector(`.band-${band}`);
+                    bandElement.style.backgroundColor = color;
+                    
+                    // Store the selection
+                    if (!gameState.targetResistor) gameState.targetResistor = {};
+                    gameState.targetResistor[`band${band}`] = {color, value};
+                });
+            });
+        }
+
+        function setMode(mode) {
+            gameState.mode = mode;
+            
+            // Hide all sections
+            tutorialSection.style.display = 'none';
+            practiceSection.style.display = 'none';
+            quizSection.style.display = 'none';
+            
+            // Reset button states
+            tutorialBtn.classList.remove('secondary');
+            practiceBtn.classList.remove('secondary');
+            quizBtn.classList.remove('secondary');
+            
+            // Show the selected section and update button state
+            if (mode === 'tutorial') {
+                tutorialSection.style.display = 'block';
+                tutorialBtn.classList.add('secondary');
+                showTutorialStep(0);
+            } else if (mode === 'practice') {
+                practiceSection.style.display = 'block';
+                practiceBtn.classList.add('secondary');
+                generatePracticeResistor();
+            } else if (mode === 'quiz') {
+                quizSection.style.display = 'block';
+                quizBtn.classList.add('secondary');
+                generateQuizResistor();
+            }
+        }
+
+        function nextTutorialStep() {
+            if (currentStep < tutorialSteps.length - 1) {
+                currentStep++;
+                showTutorialStep(currentStep);
+            }
+        }
+
+        function prevTutorialStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                showTutorialStep(currentStep);
+            }
+        }
+
+        function showTutorialStep(stepIndex) {
+            tutorialSteps.forEach((step, index) => {
+                step.classList.remove('active');
+                if (index === stepIndex) {
+                    step.classList.add('active');
+                    currentStep = stepIndex;
+                }
+            });
+        }
+
+        function generatePracticeResistor() {
+            feedback.innerHTML = '';
+            valueOptions.innerHTML = '';
+            
+            // Generate a random resistor
+            const band1Color = gameState.digitColors[Math.floor(Math.random() * gameState.digitColors.length)];
+            const band2Color = gameState.digitColors[Math.floor(Math.random() * gameState.digitColors.length)];
+            const band3Color = gameState.multiplierColors[Math.floor(Math.random() * gameState.multiplierColors.length)];
+            const band4Color = gameState.toleranceColors[Math.floor(Math.random() * gameState.toleranceColors.length)];
+            
+            // Calculate the resistor value
+            const digit1 = gameState.colorCodes[band1Color].digit;
+            const digit2 = gameState.colorCodes[band2Color].digit;
+            const multiplier = gameState.colorCodes[band3Color].multiplier;
+            const tolerance = gameState.colorCodes[band4Color].tolerance;
+            
+            const resistance = (digit1 * 10 + digit2) * multiplier;
+            
+            // Store the correct answer
+            gameState.currentResistor = {
+                band1: band1Color,
+                band2: band2Color,
+                band3: band3Color,
+                band4: band4Color,
+                value: resistance,
+                tolerance: tolerance
+            };
+            
+            // Display the resistor
+            resistorDisplay.innerHTML = `
+                <div class="band band-1" style="background-color: ${band1Color};"></div>
+                <div class="band band-2" style="background-color: ${band2Color};"></div>
+                <div class="band band-3" style="background-color: ${band3Color};"></div>
+                <div class="band band-4" style="background-color: ${band4Color};"></div>
+            `;
+            
+            // Generate options (1 correct and 3 incorrect)
+            const options = [resistance];
+            while (options.length < 4) {
+                // Generate a similar but incorrect value
+                let option;
+                const variation = Math.random();
+                
+                if (variation < 0.33) {
+                    // Change the first digit
+                    option = (Math.floor(Math.random() * 9 + 1) * 10 + digit2) * multiplier;
+                } else if (variation < 0.66) {
+                    // Change the second digit
+                    option = (digit1 * 10 + Math.floor(Math.random() * 10)) * multiplier;
+                } else {
+                    // Change the multiplier
+                    const newMultiplier = gameState.multiplierColors[Math.floor(Math.random() * gameState.multiplierColors.length)];
+                    option = (digit1 * 10 + digit2) * gameState.colorCodes[newMultiplier].multiplier;
+                }
+                
+                // Ensure the option is unique and not equal to the correct answer
+                if (!options.includes(option) && option !== resistance) {
+                    options.push(option);
+                }
+            }
+            
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+            
+            // Display options
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'g-button secondary';
+                button.style.margin = '4px';
+                button.textContent = formatResistance(option) + 'Ω';
+                button.addEventListener('click', () => checkPracticeAnswer(option));
+                valueOptions.appendChild(button);
+            });
+        }
+
+        function checkPracticeAnswer(selectedValue) {
+            const correctValue = gameState.currentResistor.value;
+            const isCorrect = selectedValue === correctValue;
+            
+            // Create feedback card
+            const feedbackCard = document.createElement('div');
+            feedbackCard.className = `g-feedback ${isCorrect ? 'success' : 'error'} show`;
+            
+            if (isCorrect) {
+                feedbackCard.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <span class="material-icons" style="margin-right: 8px;">check_circle</span>
+                        <strong>Correct!</strong>
+                    </div>
+                    <div style="margin-top: 8px;">${formatResistance(correctValue)}Ω ±${gameState.currentResistor.tolerance}%</div>
+                `;
+                
+                gameState.score += 10 * gameState.level;
+                gameState.streak += 1;
+                gameState.progress += 10;
+                
+                // Highlight correct answer
+                document.querySelectorAll('#valueOptions button').forEach(btn => {
+                    if (btn.textContent.includes(formatResistance(correctValue) + 'Ω')) {
+                        btn.classList.add('correct-answer');
+                    }
+                });
+            } else {
+                feedbackCard.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <span class="material-icons" style="margin-right: 8px;">error</span>
+                        <strong>Incorrect</strong>
+                    </div>
+                    <div style="margin-top: 8px;">The correct answer is ${formatResistance(correctValue)}Ω ±${gameState.currentResistor.tolerance}%</div>
+                `;
+                
+                gameState.streak = 0;
+                
+                // Highlight correct and incorrect answers
+                document.querySelectorAll('#valueOptions button').forEach(btn => {
+                    if (btn.textContent.includes(formatResistance(correctValue) + 'Ω')) {
+                        btn.classList.add('correct-answer');
+                    } else if (btn.textContent.includes(formatResistance(selectedValue) + 'Ω')) {
+                        btn.classList.add('incorrect-answer');
+                    }
+                });
+            }
+            
+            feedback.innerHTML = '';
+            feedback.appendChild(feedbackCard);
+            
+            // Check for level up
+            if (gameState.progress >= 100 && gameState.level < 5) {
+                gameState.level += 1;
+                gameState.progress = 0;
+                
+                const levelUpCard = document.createElement('div');
+                levelUpCard.className = 'g-feedback warning show';
+                levelUpCard.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <span class="material-icons" style="margin-right: 8px;">military_tech</span>
+                        <strong>Level Up!</strong>
+                    </div>
+                    <div style="margin-top: 8px;">Now at level ${gameState.level}</div>
+                `;
+                feedback.appendChild(levelUpCard);
+            }
+            
+            updateStats();
+            
+            // Disable all options
+            document.querySelectorAll('#valueOptions button').forEach(btn => {
+                btn.disabled = true;
+            });
+        }
+
+        function generateQuizResistor() {
+            quizFeedback.innerHTML = '';
+            
+            // Reset the quiz resistor display
+            quizResistor.querySelector('.band-1').style.backgroundColor = 'gray';
+            quizResistor.querySelector('.band-2').style.backgroundColor = 'gray';
+            quizResistor.querySelector('.band-3').style.backgroundColor = 'gray';
+            quizResistor.querySelector('.band-4').style.backgroundColor = 'gold';
+            
+            // Reset selected color options
+            document.querySelectorAll('.color-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Generate a random target resistance
+            const digit1 = Math.floor(Math.random() * 9) + 1; // 1-9 (first digit can't be 0)
+            const digit2 = Math.floor(Math.random() * 10); // 0-9
+            const multiplierOptions = [1, 10, 100, 1000, 10000, 100000, 1000000];
+            const multiplier = multiplierOptions[Math.floor(Math.random() * multiplierOptions.length)];
+            
+            const resistance = (digit1 * 10 + digit2) * multiplier;
+            gameState.targetResistor = {
+                digit1,
+                digit2,
+                multiplier,
+                value: resistance
+            };
+            
+            targetValue.textContent = formatResistance(resistance);
+        }
+
+        function checkQuizAnswer() {
+            if (!gameState.targetResistor || !gameState.targetResistor.band1 || !gameState.targetResistor.band2 || !gameState.targetResistor.band3) {
+                quizFeedback.innerHTML = `
+                    <div class="g-feedback error show">
+                        <div style="display: flex; align-items: center;">
+                            <span class="material-icons" style="margin-right: 8px;">warning</span>
+                            <strong>Please select colors for all bands</strong>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Get selected colors
+            const band1Color = gameState.targetResistor.band1.color;
+            const band2Color = gameState.targetResistor.band2.color;
+            const band3Color = gameState.targetResistor.band3.color;
+            const band4Color = gameState.targetResistor.band4 ? gameState.targetResistor.band4.color : 'gold';
+            
+            // Calculate resistance from selected colors
+            const digit1 = gameState.colorCodes[band1Color]?.digit;
+            const digit2 = gameState.colorCodes[band2Color]?.digit;
+            const multiplier = gameState.colorCodes[band3Color]?.multiplier;
+            const tolerance = gameState.colorCodes[band4Color]?.tolerance || 5; // Default to gold tolerance
+            
+            const selectedResistance = (digit1 * 10 + digit2) * multiplier;
+            const targetResistance = gameState.targetResistor.value;
+            
+            const isCorrect = selectedResistance === targetResistance;
+            
+            // Create feedback card
+            const feedbackCard = document.createElement('div');
+            feedbackCard.className = `g-feedback ${isCorrect ? 'success' : 'error'} show`;
+            
+            if (isCorrect) {
+                feedbackCard.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <span class="material-icons" style="margin-right: 8px;">check_circle</span>
+                        <strong>Correct!</strong>
+                    </div>
+                    <div style="margin-top: 8px;">${formatResistance(selectedResistance)}Ω ±${tolerance}%</div>
+                `;
+                
+                gameState.score += 15 * gameState.level;
+                gameState.streak += 1;
+                gameState.progress += 15;
+            } else {
+                feedbackCard.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <span class="material-icons" style="margin-right: 8px;">error</span>
+                        <strong>Incorrect</strong>
+                    </div>
+                    <div style="margin-top: 8px;">The correct combination is: ${gameState.targetResistor.digit1}${gameState.targetResistor.digit2} × ${gameState.targetResistor.multiplier}Ω</div>
+                `;
+                
+                gameState.streak = 0;
+            }
+            
+            quizFeedback.innerHTML = '';
+            quizFeedback.appendChild(feedbackCard);
+            
+            // Check for level up
+            if (gameState.progress >= 100 && gameState.level < 5) {
+                gameState.level += 1;
+                gameState.progress = 0;
+                
+                const levelUpCard = document.createElement('div');
+                levelUpCard.className = 'g-feedback warning show';
+                levelUpCard.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <span class="material-icons" style="margin-right: 8px;">military_tech</span>
+                        <strong>Level Up!</strong>
+                    </div>
+                    <div style="margin-top: 8px;">Now at level ${gameState.level}</div>
+                `;
+                quizFeedback.appendChild(levelUpCard);
+            }
+            
+            updateStats();
+        }
+
+        function formatResistance(resistance) {
+            if (resistance >= 1000000) {
+                return (resistance / 1000000) + 'M';
+            } else if (resistance >= 1000) {
+                return (resistance / 1000) + 'k';
+            }
+            return resistance;
+        }
+
+        function updateStats() {
+            levelDisplay.textContent = gameState.level;
+            scoreDisplay.textContent = gameState.score;
+            streakDisplay.textContent = gameState.streak;
+            progressFill.style.width = `${gameState.progress}%`;
+            
+            // Add pulse animation if on a streak
+            if (gameState.streak >= 3) {
+                streakDisplay.classList.add('animate__animated', 'animate__pulse', 'animate__infinite');
+            } else {
+                streakDisplay.classList.remove('animate__animated', 'animate__pulse', 'animate__infinite');
+            }
+        }
+    </script>
+</body>
+</html>
